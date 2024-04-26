@@ -1,48 +1,48 @@
-Overview
-========
+**Data Pipeline with Astronomer: ETL for Biodiv-Sport API**
 
-Welcome to Astronomer! This project was generated after you ran 'astro dev init' using the Astronomer CLI. This readme describes the contents of the project, as well as how to run Apache Airflow on your local machine.
+**Overview**
 
-Project Contents
-================
+This data pipeline project uses Astronomer to extract, transform, and load data from the Biodiv-Sport API into BigQuery. The pipeline is designed to run daily and fetches data from the API, applies various transformations, and loads the data into a BigQuery dataset.
 
-Your Astro project contains the following files and folders:
+**Components**
 
-- dags: This folder contains the Python files for your Airflow DAGs. By default, this directory includes one example DAG:
-    - `example_astronauts`: This DAG shows a simple ETL pipeline example that queries the list of astronauts currently in space from the Open Notify API and prints a statement for each astronaut. The DAG uses the TaskFlow API to define tasks in Python, and dynamic task mapping to dynamically print a statement for each astronaut. For more on how this DAG works, see our [Getting started tutorial](https://docs.astronomer.io/learn/get-started-with-airflow).
-- Dockerfile: This file contains a versioned Astro Runtime Docker image that provides a differentiated Airflow experience. If you want to execute other commands or overrides at runtime, specify them here.
-- include: This folder contains any additional files that you want to include as part of your project. It is empty by default.
-- packages.txt: Install OS-level packages needed for your project by adding them to this file. It is empty by default.
-- requirements.txt: Install Python packages needed for your project by adding them to this file. It is empty by default.
-- plugins: Add custom or community plugins for your project to this file. It is empty by default.
-- airflow_settings.yaml: Use this local-only file to specify Airflow Connections, Variables, and Pools instead of entering them in the Airflow UI as you develop DAGs in this project.
+* **Data Extraction**: The pipeline uses the `requests` library to fetch data from the Biodiv-Sport API.
+* **Data Transformation**: The pipeline applies various transformations to the data, including:
+	+ Removing HTML tags from text fields
+	+ Converting dates to a standard format
+	+ Extracting location information from coordinates
+	+ Adding month names to the data
+	+ Exploding arrays into separate rows
+	+ Converting data types
+* **Data Loading**: The pipeline uses the `pandas_gbq` library to load the transformed data into a BigQuery dataset.
 
-Deploy Your Project Locally
-===========================
+**Configuration**
 
-1. Start Airflow on your local machine by running 'astro dev start'.
+The pipeline uses environment variables to configure the API URL, project ID, dataset name, and service account credentials. These variables are stored in a `.env` file and loaded using the `dotenv` library.
 
-This command will spin up 4 Docker containers on your machine, each for a different Airflow component:
+**Schedule**
 
-- Postgres: Airflow's Metadata Database
-- Webserver: The Airflow component responsible for rendering the Airflow UI
-- Scheduler: The Airflow component responsible for monitoring and triggering tasks
-- Triggerer: The Airflow component responsible for triggering deferred tasks
+The pipeline is scheduled to run daily using Astronomer's scheduling feature.
 
-2. Verify that all 4 Docker containers were created by running 'docker ps'.
+**Dependencies**
 
-Note: Running 'astro dev start' will start your project with the Airflow Webserver exposed at port 8080 and Postgres exposed at port 5432. If you already have either of those ports allocated, you can either [stop your existing Docker containers or change the port](https://docs.astronomer.io/astro/test-and-troubleshoot-locally#ports-are-not-available).
+The pipeline depends on the following libraries:
 
-3. Access the Airflow UI for your local Airflow project. To do so, go to http://localhost:8080/ and log in with 'admin' for both your Username and Password.
+* `requests`
+* `BeautifulSoup`
+* `pandas`
+* `pandas_gbq`
+* `geopy`
+* `dotenv`
 
-You should also be able to access your Postgres Database at 'localhost:5432/postgres'.
+**Service Account Credentials**
 
-Deploy Your Project to Astronomer
-=================================
+The pipeline uses a service account credentials file to authenticate with BigQuery. This file should be stored in a secure location, such as a secrets manager.
 
-If you have an Astronomer account, pushing code to a Deployment on Astronomer is simple. For deploying instructions, refer to Astronomer documentation: https://docs.astronomer.io/cloud/deploy-code/
+**BigQuery Dataset**
 
-Contact
-=======
+The pipeline loads data into a BigQuery dataset specified by the `DATASET_NAME` environment variable.
 
-The Astronomer CLI is maintained with love by the Astronomer team. To report a bug or suggest a change, reach out to our support.
+**Troubleshooting**
+
+If you encounter any issues with the pipeline, check the Astronomer logs for errors and debug messages. You can also test individual tasks using the Astronomer CLI.
